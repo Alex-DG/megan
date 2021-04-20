@@ -1,5 +1,7 @@
 # Three.js Megan
 
+[DEMO](https://threejs-megan.netlify.app/)
+
 ## Setup
 
 Download [Node.js](https://nodejs.org/en/download/).
