@@ -9,6 +9,7 @@ import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
+import { playAction } from './utils/animation'
 
 import * as dat from 'dat.gui'
 
@@ -23,13 +24,15 @@ console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 // Debug
 const gui = new dat.GUI({ width: 300 })
 
-const parameters = {
+let parameters = {
   wireframe: false,
   floor: true,
+  animations: [],
 }
 
 const displayFolder = gui.addFolder('Display')
 const lightFolder = gui.addFolder('Light')
+const animationtFolder = gui.addFolder('Animations')
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -40,6 +43,9 @@ const scene = new THREE.Scene()
 // Model
 let content
 
+// Animation
+let mixer
+
 // Binary path
 const MEGAN_PATH = '/models/Megan/Megan.glb'
 
@@ -47,6 +53,7 @@ const MEGAN_PATH = '/models/Megan/Megan.glb'
  * Model
  */
 const gltfLoader = new GLTFLoader() // initialise loader
+
 gltfLoader.load(
   MEGAN_PATH,
   (gltf) => {
@@ -59,6 +66,24 @@ gltfLoader.load(
     scene.add(content.scene)
 
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
+
+    // Animations
+    mixer = new THREE.AnimationMixer(content.scene)
+
+    // Populate GUI's parameters with animations
+    for (const { name } of content.animations) {
+      // Update parameters with animations' name
+      parameters = {
+        ...parameters,
+        [name]: false,
+      }
+
+      // Trigger play on animation selected
+      animationtFolder.add(parameters, name).onChange((value) => {
+        mixer.stopAllAction()
+        if (value) playAction(mixer, content.animations, name)
+      })
+    }
 
     guiPosition(displayFolder, content.scene)
     hideLoading()
@@ -213,11 +238,16 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 /**
  * Animate
  */
-// const clock = new THREE.Clock()
+const clock = new THREE.Clock()
+let previousTime = 0
 
 const animate = () => {
-  // const elapsedTime = clock.getElapsedTime()
-  // const deltaTime = clock.getElapsedTime()
+  const elapsedTime = clock.getElapsedTime()
+  const deltaTime = elapsedTime - previousTime
+  previousTime = elapsedTime
+
+  // Model animation
+  mixer?.update(deltaTime)
 
   // Update controls
   controls.update()
