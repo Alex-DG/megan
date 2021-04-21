@@ -145,6 +145,9 @@ displayFolder.add(parameters, 'wireframe').onChange((value) => {
   })
 })
 
+displayFolder.add(controls, 'autoRotate')
+displayFolder.add(controls, 'autoRotateSpeed').min(1).max(20).step(1)
+
 /**
  * Renderer
  */
