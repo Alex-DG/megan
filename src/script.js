@@ -8,6 +8,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
+import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
 
 import * as dat from 'dat.gui'
 
@@ -21,13 +22,14 @@ console.log('...::..::: Loading Megan 🤖 :::..::.:..')
  */
 // Debug
 const gui = new dat.GUI({ width: 300 })
+
 const parameters = {
   wireframe: false,
   floor: true,
-  positionX: 0,
-  positionY: 0,
-  positionZ: 0,
 }
+
+const displayFolder = gui.addFolder('Display')
+const lightFolder = gui.addFolder('Light')
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -57,6 +59,8 @@ gltfLoader.load(
     scene.add(content.scene)
 
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
+
+    guiPosition(displayFolder, content.scene)
     hideLoading()
   },
   (xhr) => trackProgress(xhr),
@@ -104,7 +108,7 @@ generateFloor()
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.9)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 4.5)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -114,7 +118,7 @@ directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = -7
 directionalLight.position.set(5, 5, 5)
 
-scene.add(ambientLight, directionalLight)
+scene.add(directionalLight, ambientLight)
 
 /**
  * Sizes
@@ -158,8 +162,8 @@ controls.target.set(0, 0.75, 0)
 /**
  * GUI
  */
-const displayFolder = gui.addFolder('Display')
 
+// --- Display ---
 displayFolder.add(parameters, 'wireframe').onChange((value) => {
   updateAllMaterials(scene, (material) => {
     material.wireframe = value
@@ -169,40 +173,20 @@ displayFolder.add(parameters, 'wireframe').onChange((value) => {
 displayFolder.add(controls, 'autoRotate')
 displayFolder.add(controls, 'autoRotateSpeed').min(1).max(20).step(1)
 
-displayFolder
-  .add(parameters, 'positionX')
-  .min(-4)
-  .max(4)
-  .step(0.01)
-  .onFinishChange((value) => {
-    content.scene.position.set(value, 0, 0)
-  })
-  .name('position X')
-
-displayFolder
-  .add(parameters, 'positionY')
-  .min(-4)
-  .max(4)
-  .step(0.01)
-  .onFinishChange((value) => {
-    content.scene.position.set(0, value, 0)
-  })
-  .name('position Y')
-
-displayFolder
-  .add(parameters, 'positionZ')
-  .min(-4)
-  .max(4)
-  .step(0.01)
-  .onFinishChange((value) => {
-    content.scene.position.set(0, 0, value)
-  })
-  .name('position Z')
-
 displayFolder.add(parameters, 'floor').onChange((value) => {
   parameters.floor = value
   generateFloor() // re generate Floor
 })
+
+// --- Light ---
+guiDirectionalLight(lightFolder, directionalLight)
+
+lightFolder
+  .add(ambientLight, 'intensity')
+  .min(0)
+  .max(6)
+  .step(0.1)
+  .name('ambientIntensity')
 
 /**
  * Renderer
@@ -211,6 +195,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   alpha: true, // testing css background color
 })
+renderer.physicallyCorrectLights = true // enable realistc lightning
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
