@@ -5,6 +5,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
+import { hideLoading } from './utils/loader'
+
 import * as dat from 'dat.gui'
 
 /**
@@ -49,10 +51,13 @@ gltfLoader.load(
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
   },
   (xhr) => {
-    console.log(
-      'Loading Progress...',
-      (xhr.loaded / xhr.total) * 100 + '% loaded'
-    )
+    const progress = (xhr.loaded / xhr.total) * 100 + '%'
+
+    console.log(`Loading progress...`, `${progress} loaded`)
+
+    if (progress === '100%') hideLoading()
+
+    console.log({ xhr })
   },
   (error) => {
     console.log('Loading error!', { error })
