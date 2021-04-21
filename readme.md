@@ -2,7 +2,7 @@
 
 [DEMO](https://threejs-megan.netlify.app/)
 
-[Preview dev envirionement](https://develop--threejs-megan.netlify.app/)
+[Preview dev environment](https://develop--threejs-megan.netlify.app/)
 
 ## Setup
 
