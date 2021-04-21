@@ -91,7 +91,7 @@ const generateFloor = () => {
     floor = new THREE.Mesh(floorGeometry, floorMaterial)
     floor.receiveShadow = true
     floor.rotation.x = -Math.PI * 0.5
-    floor.position.y = -1
+    floor.position.y = -1.4
 
     scene.add(floor)
   }
