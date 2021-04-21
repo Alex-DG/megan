@@ -5,7 +5,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-import { hideLoading } from './utils/loader'
+import { hideLoading, trackProgress } from './utils/loader'
+import { showError } from './utils/error'
 
 import * as dat from 'dat.gui'
 
@@ -31,7 +32,7 @@ const scene = new THREE.Scene()
 let content
 
 // Binary path
-const MEGAN_PATH = '/models/Megan/Megan.glb'
+const MEGAN_PATH = '/models/Megan/Megaeen.glb'
 
 /**
  * Model
@@ -49,19 +50,10 @@ gltfLoader.load(
     scene.add(content.scene)
 
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
+    hideLoading()
   },
-  (xhr) => {
-    const progress = (xhr.loaded / xhr.total) * 100 + '%'
-
-    console.log(`Loading progress...`, `${progress} loaded`)
-
-    if (progress === '100%') hideLoading()
-
-    console.log({ xhr })
-  },
-  (error) => {
-    console.log('Loading error!', { error })
-  }
+  (xhr) => trackProgress(xhr),
+  (error) => showError(error)
 )
 
 /**

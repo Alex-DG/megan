@@ -45,15 +45,3 @@ body {
 
   font-size: 2rem;
 }
-
-.circleloader {
-  position: absolute;
-  box-sizing: border-box;
-  top: 50%;
-  margin-top: -10px;
-  border-radius: 16px;
-  width: 80px;
-  height: 20px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.4);
-}
