@@ -32,7 +32,7 @@ const scene = new THREE.Scene()
 let content
 
 // Binary path
-const MEGAN_PATH = '/models/Megan/Megaeen.glb'
+const MEGAN_PATH = '/models/Megan/Megan.glb'
 
 /**
  * Model
