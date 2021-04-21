@@ -121,6 +121,13 @@ directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight, ambientLight)
 
 /**
+ * Axes
+ */
+const axesHelper = new THREE.AxesHelper(5)
+axesHelper.visible = false
+scene.add(axesHelper)
+
+/**
  * Sizes
  */
 const sizes = {
@@ -177,6 +184,8 @@ displayFolder.add(parameters, 'floor').onChange((value) => {
   parameters.floor = value
   generateFloor() // re generate Floor
 })
+
+displayFolder.add(axesHelper, 'visible').name('Axes')
 
 // --- Light ---
 guiDirectionalLight(lightFolder, directionalLight)
