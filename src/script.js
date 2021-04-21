@@ -24,6 +24,9 @@ const gui = new dat.GUI({ width: 300 })
 const parameters = {
   wireframe: false,
   floor: true,
+  positionX: 0,
+  positionY: 0,
+  positionZ: 0,
 }
 
 // Canvas
@@ -63,20 +66,38 @@ gltfLoader.load(
 /**
  * Floor
  */
-const floorGeometry = new THREE.PlaneGeometry(10, 10)
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: '#444444',
-  metalness: 0,
-  roughness: 0.5,
-  transparent: true,
-})
+let floor = null
+let floorGeometry = null
+let floorMaterial = null
 
-const floor = new THREE.Mesh(floorGeometry, floorMaterial)
-floor.receiveShadow = true
-floor.rotation.x = -Math.PI * 0.5
-floor.position.y = -1
+const generateFloor = () => {
+  // Remove floor before generation if it does already exist
+  if (floor !== null) {
+    floorGeometry.dispose()
+    floorMaterial.dispose()
 
-scene.add(floor)
+    scene.remove(floor)
+  }
+
+  if (parameters.floor) {
+    floorGeometry = new THREE.PlaneGeometry(10, 10)
+    floorMaterial = new THREE.MeshStandardMaterial({
+      color: '#444444',
+      metalness: 0,
+      roughness: 0.5,
+      transparent: true,
+    })
+
+    floor = new THREE.Mesh(floorGeometry, floorMaterial)
+    floor.receiveShadow = true
+    floor.rotation.x = -Math.PI * 0.5
+    floor.position.y = -1
+
+    scene.add(floor)
+  }
+}
+
+generateFloor()
 
 /**
  * Lights
@@ -147,6 +168,41 @@ displayFolder.add(parameters, 'wireframe').onChange((value) => {
 
 displayFolder.add(controls, 'autoRotate')
 displayFolder.add(controls, 'autoRotateSpeed').min(1).max(20).step(1)
+
+displayFolder
+  .add(parameters, 'positionX')
+  .min(-4)
+  .max(4)
+  .step(0.01)
+  .onFinishChange((value) => {
+    content.scene.position.set(value, 0, 0)
+  })
+  .name('position X')
+
+displayFolder
+  .add(parameters, 'positionY')
+  .min(-4)
+  .max(4)
+  .step(0.01)
+  .onFinishChange((value) => {
+    content.scene.position.set(0, value, 0)
+  })
+  .name('position Y')
+
+displayFolder
+  .add(parameters, 'positionZ')
+  .min(-4)
+  .max(4)
+  .step(0.01)
+  .onFinishChange((value) => {
+    content.scene.position.set(0, 0, value)
+  })
+  .name('position Z')
+
+displayFolder.add(parameters, 'floor').onChange((value) => {
+  parameters.floor = value
+  generateFloor() // re generate Floor
+})
 
 /**
  * Renderer
