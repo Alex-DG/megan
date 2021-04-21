@@ -3,13 +3,14 @@ import './style.css'
 import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import * as dat from 'dat.gui'
 
 /**
  * Project template: gui, scene/floor/camera, orbital controls
  */
-console.log('...::..::: Hi from Megan 🤖 :::..::.:..')
+console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
 /**
  * Base
@@ -23,6 +24,40 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+// Model
+let content
+
+// Binary path
+const MEGAN_PATH = '/models/Megan/Megan.glb'
+
+/**
+ * Model
+ */
+const gltfLoader = new GLTFLoader() // initialise loader
+gltfLoader.load(
+  MEGAN_PATH,
+  (gltf) => {
+    content = gltf
+
+    // Make Megan bigger
+    content.scene.scale.set(10, 10, 10)
+
+    // From "model's scene" to "our scene!"
+    scene.add(content.scene)
+
+    console.log('...::..::: Hi from Megan 👋 :::..::.:..')
+  },
+  (xhr) => {
+    console.log(
+      'Loading Progress...',
+      (xhr.loaded / xhr.total) * 100 + '% loaded'
+    )
+  },
+  (error) => {
+    console.log('Loading error!', { error })
+  }
+)
 
 /**
  * Floor
@@ -38,6 +73,7 @@ const floorMaterial = new THREE.MeshStandardMaterial({
 const floor = new THREE.Mesh(floorGeometry, floorMaterial)
 floor.receiveShadow = true
 floor.rotation.x = -Math.PI * 0.5
+floor.position.y = -1
 
 scene.add(floor)
 
@@ -85,12 +121,12 @@ window.addEventListener('resize', () => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  75,
+  80,
   sizes.width / sizes.height,
   0.1,
   100
 )
-camera.position.set(2, 2, 2)
+camera.position.set(0, 0.9, 3)
 scene.add(camera)
 
 // Controls
