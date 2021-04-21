@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { hideLoading, trackProgress } from './utils/loader'
+import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 
 import * as dat from 'dat.gui'
@@ -20,7 +21,10 @@ console.log('...::..::: Loading Megan 🤖 :::..::.:..')
  */
 // Debug
 const gui = new dat.GUI({ width: 300 })
-const parameters = {}
+const parameters = {
+  wireframe: false,
+  floor: true,
+}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -77,9 +81,9 @@ scene.add(floor)
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.9)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -129,6 +133,17 @@ scene.add(camera)
 // Controls
 let controls = new OrbitControls(camera, canvas)
 controls.target.set(0, 0.75, 0)
+
+/**
+ * GUI
+ */
+const displayFolder = gui.addFolder('Display')
+
+displayFolder.add(parameters, 'wireframe').onChange((value) => {
+  updateAllMaterials(scene, (material) => {
+    material.wireframe = value
+  })
+})
 
 /**
  * Renderer
