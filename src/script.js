@@ -9,7 +9,7 @@ import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
-import { playAction } from './utils/animation'
+import { fadeToAction } from './utils/animation'
 
 import * as dat from 'dat.gui'
 
@@ -19,7 +19,7 @@ import * as dat from 'dat.gui'
 console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
 /**
- * Base
+ * [ Base ]
  */
 // Debug
 const gui = new dat.GUI({ width: 300 })
@@ -72,7 +72,7 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true // enable inertia to give a sense of weight to the controls
 
 /**
- * Model
+ * [ Model ]
  */
 const gltfLoader = new GLTFLoader() // initialise loader
 
@@ -87,13 +87,13 @@ gltfLoader.load(
     box.getCenter(center)
     content.scene.position.sub(center)
 
+    // Animations
+    mixer = new THREE.AnimationMixer(content.scene)
+
     // From "model's scene" to "our scene!"
     scene.add(content.scene)
 
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
-
-    // Animations
-    mixer = new THREE.AnimationMixer(content.scene)
 
     // Populate GUI's parameters with animations
     for (const { name } of content.animations) {
@@ -105,8 +105,10 @@ gltfLoader.load(
 
       // Trigger play on animation selected
       animationtFolder.add(parameters, name).onChange((value) => {
-        mixer.stopAllAction()
-        if (value) playAction(mixer, content.animations, name)
+        const action = mixer.clipAction(
+          content.animations.find((a) => a.name === name)
+        )
+        fadeToAction(action, 0.5, value)
       })
     }
 
@@ -118,7 +120,7 @@ gltfLoader.load(
 )
 
 /**
- * Floor
+ * [ Floor ]
  *
  * This Mesh was initially used to:
  * - test if the project template initially was working and redering something before loading Megane
@@ -159,7 +161,7 @@ const generateFloor = () => {
 generateFloor()
 
 /**
- * Lights
+ * [ Lights ]
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.9)
 
@@ -176,14 +178,14 @@ directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight, ambientLight)
 
 /**
- * Axes
+ * [ Axes ]
  */
 const axesHelper = new THREE.AxesHelper(5)
 axesHelper.visible = false
 scene.add(axesHelper)
 
 /**
- * Events
+ * [ Events ]
  */
 window.addEventListener('resize', () => {
   // Update sizes
@@ -200,7 +202,7 @@ window.addEventListener('resize', () => {
 })
 
 /**
- * GUI
+ * [ GUI ]
  */
 // --- Display ---
 displayFolder.add(parameters, 'wireframe').onChange((value) => {
@@ -230,20 +232,21 @@ lightFolder
   .name('ambientIntensity')
 
 /**
- * Renderer
+ * [ Renderer ]
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   alpha: true, // testing css background color
 })
-renderer.physicallyCorrectLights = true // enable realistc lightning
+
+renderer.physicallyCorrectLights = true // change Three.js lights for more realistic values
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
- * Animate
+ * [ Animate ]
  */
 const clock = new THREE.Clock()
 let previousTime = 0
