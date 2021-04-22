@@ -30,9 +30,6 @@ let parameters = {
   action: 'none',
 }
 
-// let parameters = onChange(parametersDefault, () => save(parametersDefault))
-// console.log({ parameters })
-
 const displayFolder = gui.addFolder('Display')
 const lightFolder = gui.addFolder('Light')
 const animationsFolder = gui.addFolder('Animations')
