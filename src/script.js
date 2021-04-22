@@ -14,7 +14,7 @@ import { playAction } from './utils/animation'
 import * as dat from 'dat.gui'
 
 /**
- * Project template: gui, scene/floor/camera, orbital controls
+ * Project template: gui, scene/floor/camera, orbital controls!
  */
 console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
@@ -26,7 +26,7 @@ const gui = new dat.GUI({ width: 300 })
 
 let parameters = {
   wireframe: false,
-  floor: true,
+  floor: false,
   animations: [],
 }
 
@@ -43,11 +43,33 @@ const scene = new THREE.Scene()
 // Model
 let content
 
+// Binary path
+const MEGAN_PATH = '/models/Megan/Megan.glb'
+
 // Animation
 let mixer
 
-// Binary path
-const MEGAN_PATH = '/models/Megan/Megan.glb'
+// Window sizes
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+}
+
+// Base camera
+//https://threejs.org/docs/#api/en/cameras/PerspectiveCamera
+const camera = new THREE.PerspectiveCamera(
+  30,
+  sizes.width / sizes.height,
+  0.1,
+  100
+)
+camera.position.set(0, 0, 1) // move the camera on Z to see Megan, z = 1
+scene.add(camera)
+
+// Controls
+// https://threejs.org/docs/#examples/en/controls/OrbitControls.enableDamping
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true // enable inertia to give a sense of weight to the controls
 
 /**
  * Model
@@ -59,8 +81,11 @@ gltfLoader.load(
   (gltf) => {
     content = gltf
 
-    // Make Megan bigger
-    content.scene.scale.set(10, 10, 10)
+    // Center Megan into the viewport
+    const box = new THREE.Box3().setFromObject(content.scene)
+    const center = new THREE.Vector3()
+    box.getCenter(center)
+    content.scene.position.sub(center)
 
     // From "model's scene" to "our scene!"
     scene.add(content.scene)
@@ -94,6 +119,11 @@ gltfLoader.load(
 
 /**
  * Floor
+ *
+ * This Mesh was initially used to:
+ * - test if the project template initially was working and redering something before loading Megane
+ * - playing with the lighting and shadow
+ * - I kept it as a GUI option disabled by default
  */
 let floor = null
 let floorGeometry = null
@@ -109,7 +139,7 @@ const generateFloor = () => {
   }
 
   if (parameters.floor) {
-    floorGeometry = new THREE.PlaneGeometry(10, 10)
+    floorGeometry = new THREE.PlaneGeometry(2, 2)
     floorMaterial = new THREE.MeshStandardMaterial({
       color: '#444444',
       metalness: 0,
@@ -120,7 +150,7 @@ const generateFloor = () => {
     floor = new THREE.Mesh(floorGeometry, floorMaterial)
     floor.receiveShadow = true
     floor.rotation.x = -Math.PI * 0.5
-    floor.position.y = -1.4
+    floor.position.y = -0.2
 
     scene.add(floor)
   }
@@ -153,13 +183,8 @@ axesHelper.visible = false
 scene.add(axesHelper)
 
 /**
- * Sizes
+ * Events
  */
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-}
-
 window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth
@@ -175,26 +200,8 @@ window.addEventListener('resize', () => {
 })
 
 /**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(
-  80,
-  sizes.width / sizes.height,
-  0.1,
-  100
-)
-camera.position.set(0, 0.9, 3)
-scene.add(camera)
-
-// Controls
-let controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 0.75, 0)
-
-/**
  * GUI
  */
-
 // --- Display ---
 displayFolder.add(parameters, 'wireframe').onChange((value) => {
   updateAllMaterials(scene, (material) => {
