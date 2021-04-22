@@ -27,12 +27,15 @@ const gui = new dat.GUI({ width: 300 })
 let parameters = {
   wireframe: false,
   floor: false,
-  animations: [],
+  action: 'none',
 }
+
+// let parameters = onChange(parametersDefault, () => save(parametersDefault))
+// console.log({ parameters })
 
 const displayFolder = gui.addFolder('Display')
 const lightFolder = gui.addFolder('Light')
-const animationtFolder = gui.addFolder('Animations')
+const animationsFolder = gui.addFolder('Animations')
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -87,33 +90,41 @@ gltfLoader.load(
     box.getCenter(center)
     content.scene.position.sub(center)
 
-    // Animations
-    mixer = new THREE.AnimationMixer(content.scene)
-
     // From "model's scene" to "our scene!"
     scene.add(content.scene)
 
-    console.log('...::..::: Hi from Megan 👋 :::..::.:..')
-
-    // Populate GUI's parameters with animations
-    for (const { name } of content.animations) {
-      // Update parameters with animations' name
-      parameters = {
-        ...parameters,
-        [name]: false,
-      }
-
-      // Trigger play on animation selected
-      animationtFolder.add(parameters, name).onChange((value) => {
-        const action = mixer.clipAction(
-          content.animations.find((a) => a.name === name)
-        )
-        fadeToAction(action, 0.5, value)
-      })
-    }
-
+    // Populate GUI with display properties coming from the glb scene
     guiPosition(displayFolder, content.scene)
+
+    /**
+     * Animations
+     */
+    const { animations } = content || { animations: [] }
+    mixer = new THREE.AnimationMixer(content.scene)
+
+    // Create Array of actions
+    const actions = [parameters.action, ...animations.map(({ name }) => name)]
+
+    // Populate GUI with actions
+    animationsFolder.add(parameters, 'action', actions).onChange((value) => {
+      switch (value) {
+        case 'none':
+          fadeToAction(undefined, 0.5) // stop previous action
+          break
+        default:
+          const action = mixer.clipAction(
+            animations.find((a) => a.name === value)
+          )
+          fadeToAction(action, 0.5) // play selected action
+      }
+    })
+
+    /**
+     * Loading done with success!
+     */
     hideLoading()
+
+    console.log('...::..::: Hi from Megan 👋 :::..::.:..')
   },
   (xhr) => trackProgress(xhr),
   (error) => showError(error)

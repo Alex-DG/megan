@@ -16,7 +16,7 @@ let activeAction, previousAction
  * @param {Number} duration - fade in timer
  * @param {Boolean} play
  */
-export const fadeToAction = (action, duration, play) => {
+export const fadeToAction = (action, duration) => {
   previousAction = activeAction
   activeAction = action
 
@@ -24,19 +24,10 @@ export const fadeToAction = (action, duration, play) => {
     previousAction?.fadeOut(duration)
   }
 
-  // Play or Stop action
-  switch (play) {
-    case false:
-      // GUI uncheck box <=> stop action  :(
-      activeAction?.fadeOut(duration)
-      break
-    default:
-      // GUI check box <=> play action :D
-      activeAction
-        ?.reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(duration)
-        .play()
-  }
+  activeAction
+    ?.reset()
+    .setEffectiveTimeScale(1)
+    .setEffectiveWeight(1)
+    .fadeIn(duration)
+    .play()
 }
