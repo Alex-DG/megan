@@ -29,7 +29,7 @@ console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 const MEGAN_DRACO_PATH = '/models/Megan/Megan-processed.glb'
 
 // Bone Animation Sequence file
-// const FILE_BONE_ANIMATION = '/models/Megan/Megan.rts'
+const FILE_BONE_ANIMATION = '/models/Megan/Megan.rts'
 
 /**
  * [ Base ]
@@ -80,6 +80,26 @@ scene.add(camera)
 // https://threejs.org/docs/#examples/en/controls/OrbitControls.enableDamping
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true // enable inertia to give a sense of weight to the controls
+
+/**
+ * [ Bone Animation Sequence file ]
+ */
+const loader = new THREE.FileLoader()
+
+// Load a text file and output the result to the console
+loader.load(
+  // resource URL
+  FILE_BONE_ANIMATION,
+
+  // onLoad callback
+  (file) => {
+    // output the text to the console
+    console.log('Success!', { file })
+  },
+
+  (xhr) => trackProgress(xhr),
+  (error) => showError(error)
+)
 
 /**
  * [ Model ]
