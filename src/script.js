@@ -25,7 +25,7 @@ console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 // const MEGAN_PATH = '/models/Megan/Megan.glb'
 
 // Megan model optimised with gltf-pipeline binary file is now ~20% smaller
-// https://github.com/CesiumGS/gltf-pipeline
+// https://github.com/CesiumGS/gltf-pipeline => command `> gltf-pipeline -i Megan.glb -0 MeganDraco.glb -d`
 const MEGAN_DRACO_PATH = '/models/Megan/Megan-processed.glb'
 
 // Bone Animation Sequence file
@@ -98,9 +98,6 @@ const gltfLoader = new GLTFLoader() // Initialise loader
 // glTF file the glTF loader is smart enough to not load draco in that case when not needed
 gltfLoader.setDRACOLoader(dracoLoader)
 
-let time = 0
-console.log(MEGAN_DRACO_PATH)
-
 gltfLoader.load(
   MEGAN_DRACO_PATH,
   (gltf) => {
@@ -146,15 +143,10 @@ gltfLoader.load(
      */
     hideLoading()
 
-    console.log('...::..::: Hi from Megan 👋 :::..::.:..')
-    console.log(`time = ${time}`)
+    console.log('...::..::: Hi from Megan-processed! 👋 :::..::.:..')
   },
 
-  (xhr) => {
-    time += 1
-    trackProgress(xhr)
-  },
-
+  (xhr) => trackProgress(xhr),
   (error) => showError(error)
 )
 
