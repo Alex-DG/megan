@@ -12,7 +12,7 @@ import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
 import { fadeToAction } from './utils/animation'
-import { fileReader } from './utils/file'
+import { getRtsFileData } from './utils/rtsFile'
 
 /**
  * Project template: gui, scene/ground/camera, orbital controls!
@@ -107,16 +107,17 @@ fileLoader.load(
 
   (file) => {
     // Step 1 - convert/manipute? the RTS to some internal format ? Not sure of the approach for now
-    fileReader(file)
+    getRtsFileData(file)
 
-    // Step 2 - From file to THREE.Bone THREE.NumberkeyframeTrack ?
+    // Step 2 - From file to THREE.NumberkeyframeTrack ?
     // just found: https://threejs.org/docs/index.html?q=NumberKeyframeTrack#api/en/animation/tracks/NumberKeyframeTrack
-    // and https://discourse.threejs.org/t/looking-for-a-way-to-animate-model-with-bones-and-joints-rotation-infos/1085/8
+    // For example:
+    // const keyFrame = new THREE.NumberKeyframeTrack( ‘.rotation’, [ 0, 1, 2 ], [ x1, y1, z1, x2, y2, z2, x3, y3, z3 ] );
 
-    // Step 3 - Start loading Megan... include the [bones] from the RTS file
+    // Step 3 - Start loading Megan... include the [frames] from the RTS file
   },
 
-  (xhr) => trackProgress(xhr),
+  (xhr) => trackProgress(xhr, 'file'),
   (error) => showError(error)
 )
 // * * * WORK IN PROGRESS /> * * *
@@ -176,7 +177,7 @@ gltfLoader.load(
     console.log('...::..::: Hi from Megan-processed! 👋 :::..::.:..')
   },
 
-  (xhr) => trackProgress(xhr),
+  (xhr) => trackProgress(xhr, 'glb'),
   (error) => showError(error)
 )
 
@@ -203,6 +204,7 @@ const generateGround = () => {
 
   if (parameters.ground) {
     groundGeometry = new THREE.PlaneGeometry(2, 2)
+
     groundMaterial = new THREE.MeshStandardMaterial({
       color: '#444444',
       metalness: 0,
