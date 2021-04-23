@@ -287,6 +287,7 @@ lightFolder
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  antialias: true, // reducing how blocky Megan looks.
   alpha: true, // testing css background color
 })
 
