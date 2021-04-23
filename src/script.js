@@ -14,7 +14,7 @@ import { fadeToAction } from './utils/animation'
 import * as dat from 'dat.gui'
 
 /**
- * Project template: gui, scene/floor/camera, orbital controls!
+ * Project template: gui, scene/ground/camera, orbital controls!
  */
 console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
@@ -26,7 +26,7 @@ const gui = new dat.GUI({ width: 300 })
 
 let parameters = {
   wireframe: false,
-  floor: false,
+  ground: false,
   action: 'none',
 }
 
@@ -128,52 +128,52 @@ gltfLoader.load(
 )
 
 /**
- * [ Floor ]
+ * [ Ground ]
  *
  * This Mesh was initially used to:
  * - test if the project template initially was working and redering something before loading Megane
  * - playing with the lighting and shadow
  * - I kept it as a GUI option disabled by default
  */
-let floor = null
-let floorGeometry = null
-let floorMaterial = null
+let ground = null
+let groundGeometry = null
+let groundMaterial = null
 
-const generateFloor = () => {
-  // Remove floor before generation if it does already exist
-  if (floor !== null) {
-    floorGeometry.dispose()
-    floorMaterial.dispose()
+const generateGround = () => {
+  // Remove ground before generation if it does already exist
+  if (ground !== null) {
+    groundGeometry.dispose()
+    groundMaterial.dispose()
 
-    scene.remove(floor)
+    scene.remove(ground)
   }
 
-  if (parameters.floor) {
-    floorGeometry = new THREE.PlaneGeometry(2, 2)
-    floorMaterial = new THREE.MeshStandardMaterial({
+  if (parameters.ground) {
+    groundGeometry = new THREE.PlaneGeometry(2, 2)
+    groundMaterial = new THREE.MeshStandardMaterial({
       color: '#444444',
       metalness: 0,
       roughness: 0.5,
       transparent: true,
     })
 
-    floor = new THREE.Mesh(floorGeometry, floorMaterial)
-    floor.receiveShadow = true
-    floor.rotation.x = -Math.PI * 0.5
-    floor.position.y = -0.2
+    ground = new THREE.Mesh(groundGeometry, groundMaterial)
+    ground.receiveShadow = true
+    ground.rotation.x = -Math.PI * 0.5
+    ground.position.y = -0.2
 
-    scene.add(floor)
+    scene.add(ground)
   }
 }
 
-generateFloor()
+generateGround()
 
 /**
  * [ Lights ]
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.5)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 5)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 5.5)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -181,7 +181,7 @@ directionalLight.shadow.camera.left = -7
 directionalLight.shadow.camera.top = 7
 directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = -7
-directionalLight.position.set(5, 5, 5)
+directionalLight.position.set(3, 5, 5)
 
 scene.add(directionalLight, ambientLight)
 
@@ -222,9 +222,9 @@ displayFolder.add(parameters, 'wireframe').onChange((value) => {
 displayFolder.add(controls, 'autoRotate')
 displayFolder.add(controls, 'autoRotateSpeed').min(1).max(20).step(1)
 
-displayFolder.add(parameters, 'floor').onChange((value) => {
-  parameters.floor = value
-  generateFloor() // re generate Floor
+displayFolder.add(parameters, 'ground').onChange((value) => {
+  parameters.ground = value
+  generateGround() // re generate Ground
 })
 
 displayFolder.add(axesHelper, 'visible').name('Axes')
