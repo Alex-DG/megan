@@ -82,26 +82,6 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true // enable inertia to give a sense of weight to the controls
 
 /**
- * [ Bone Animation Sequence file ]
- */
-const loader = new THREE.FileLoader()
-
-// Load a text file and output the result to the console
-loader.load(
-  // resource URL
-  FILE_BONE_ANIMATION,
-
-  // onLoad callback
-  (file) => {
-    // output the text to the console
-    console.log('Success!', { file })
-  },
-
-  (xhr) => trackProgress(xhr),
-  (error) => showError(error)
-)
-
-/**
  * [ Model ]
  */
 // Draco is a compression method that can be used inside of glTF files
@@ -118,10 +98,31 @@ const gltfLoader = new GLTFLoader() // Initialise loader
 // glTF file the glTF loader is smart enough to not load draco in that case when not needed
 gltfLoader.setDRACOLoader(dracoLoader)
 
+// Bone Animation Sequence file
+const fileLoader = new THREE.FileLoader()
+// fileLoader.setResponseType('arraybuffer')
+
+// Load a text file and output the result to the console
+fileLoader.load(
+  // resource URL
+  FILE_BONE_ANIMATION,
+
+  // onLoad callback
+  (file) => {
+    // output the text to the console
+    console.log(file)
+  },
+
+  (xhr) => trackProgress(xhr),
+  (error) => showError(error)
+)
+
 gltfLoader.load(
   MEGAN_DRACO_PATH,
   (gltf) => {
     content = gltf
+
+    console.log({ gltf })
 
     // Center Megan into the viewport
     const box = new THREE.Box3().setFromObject(content.scene)
@@ -131,6 +132,12 @@ gltfLoader.load(
 
     // From "model's scene" to "our scene!"
     scene.add(content.scene)
+
+    // Add Skeleton helper option to GUI
+    const helper = new THREE.SkeletonHelper(content.scene)
+    helper.visible = false
+    scene.add(helper)
+    displayFolder.add(helper, 'visible').name('skeleton')
 
     // Populate GUI with display properties coming from the glb scene
     guiPosition(displayFolder, content.scene)
