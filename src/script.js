@@ -10,9 +10,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
-import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
+import { guiPosition, guiDirectionalLight } from './utils/gui'
 import { fadeToAction } from './utils/animation'
-import { getRtsFileData } from './utils/rtsFile'
+import { buildBoneAnimationSequence, readRtsFile } from './utils/rtsFile'
 
 /**
  * Project template: gui, scene/ground/camera, orbital controls!
@@ -105,16 +105,28 @@ fileLoader.setResponseType('blob') // `blob` format needed to parse the file mod
 fileLoader.load(
   FILE_BONE_ANIMATION,
 
-  (file) => {
-    // Step 1 - convert/manipute? the RTS to some internal format ? Not sure of the approach for now
-    getRtsFileData(file)
+  async (file) => {
+    const data = await readRtsFile(file)
+    const bones = buildBoneAnimationSequence(data)
+    console.log('Bones from RTS 🦴', { bones })
+    console.log('=> Do something with these bones now! 🦴🦴🦴')
 
-    // Step 2 - From file to THREE.NumberkeyframeTrack ?
-    // just found: https://threejs.org/docs/index.html?q=NumberKeyframeTrack#api/en/animation/tracks/NumberKeyframeTrack
-    // For example:
-    // const keyFrame = new THREE.NumberKeyframeTrack( ‘.rotation’, [ 0, 1, 2 ], [ x1, y1, z1, x2, y2, z2, x3, y3, z3 ] );
+    // {Step1} - convert RTS to readable data [ DONE ]!!!
 
-    // Step 3 - Start loading Megan... include the [frames] from the RTS file
+    // {Step 2} - [ TODO ] - reading documentation, checking examples in three.js repo
+    // create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
+    // Note: the keyframe track type should correspond to the type of the property being animated
+
+    // TRANSLATION
+    // const positionKF = new THREE.VectorKeyframeTrack( '.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
+    // SCALE
+    // const scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
+    // ROTATION
+    // Rotation should be performed using quaternions, using a THREE.QuaternionKeyframeTrack
+    // Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
+
+    // {Step 3} - [ TODO ]
+    // Start loading Megan... include the [frames] from the RTS file ? (just guessing not sure yet)
   },
 
   (xhr) => trackProgress(xhr, 'file'),
