@@ -2,7 +2,8 @@
 
 [DEMO](https://threejs-megan.netlify.app/)
 
-[Preview dev environment](https://develop--threejs-megan.netlify.app/)
+- I tried to describe through all my comnments my approach and how I was looking for more details in Three.js doc
+- Please keep your web browser console open to see the logs
 
 ## Setup
 
