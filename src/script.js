@@ -171,9 +171,9 @@ generateGround()
 /**
  * [ Lights ]
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 5.5)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -181,7 +181,7 @@ directionalLight.shadow.camera.left = -7
 directionalLight.shadow.camera.top = 7
 directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = -7
-directionalLight.position.set(3, 5, 5)
+directionalLight.position.set(2, 5, 5)
 
 scene.add(directionalLight, ambientLight)
 
@@ -247,9 +247,17 @@ const renderer = new THREE.WebGLRenderer({
   alpha: true, // testing css background color
 })
 
-renderer.physicallyCorrectLights = true // change Three.js lights for more realistic values
+// Change default outputEncoding to sRGBEncoding: improve the color result rendering of Megan
+// https://threejs.org/docs/index.html?q=WebGLRenderer#api/en/renderers/WebGLRenderer.outputEncoding
+renderer.outputEncoding = THREE.sRGBEncoding
+
+// Change the default lights rendering for more realistic values
+//https://threejs.org/docs/#api/en/renderers/WebGLRenderer.physicallyCorrectLights
+renderer.physicallyCorrectLights = true
+
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
