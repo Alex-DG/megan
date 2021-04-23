@@ -1,3 +1,10 @@
+/**
+ * Manage  GUI position options under
+ * the display folder
+ *
+ * @param {*} folder
+ * @param {THREE.Scene} scene
+ */
 export const guiPosition = (folder, scene) => {
   folder
     .add(scene.rotation, 'y')
@@ -37,6 +44,13 @@ export const guiPosition = (folder, scene) => {
     .name('position Z')
 }
 
+/**
+ * Manage GUI directional light options under
+ * the light folder
+ *
+ * @param {*} folder
+ * @param {THREE.DirectionalLight} light
+ */
 export const guiDirectionalLight = (folder, light) => {
   folder
     .add(light, 'intensity')

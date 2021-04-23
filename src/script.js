@@ -1,6 +1,7 @@
 import './style.css'
 
 import * as THREE from 'three'
+import * as dat from 'dat.gui'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -11,8 +12,7 @@ import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/guiHelper'
 import { fadeToAction } from './utils/animation'
-
-import * as dat from 'dat.gui'
+import { fileReader } from './utils/file'
 
 /**
  * Project template: gui, scene/ground/camera, orbital controls!
@@ -54,7 +54,7 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 // Model
-let content
+let model
 
 // Animation
 let mixer
@@ -92,61 +92,60 @@ dracoLoader.setDecoderPath('/draco/')
 // Optional: Pre-fetch Draco WASM/JS module.
 dracoLoader.preload()
 
-const gltfLoader = new GLTFLoader() // Initialise loader
-// glTF loader is setup with the draco loader which means
-// if you load a draco file the draco loader will kick off, if it's a standard
-// glTF file the glTF loader is smart enough to not load draco in that case when not needed
+const gltfLoader = new GLTFLoader()
+// glTF loader is setup with the draco loader: if you load a draco file the draco loader will kick off, if it's a standard
+// glTF file the glTF loader is smart enough to not load draco when not needed: so I did convert the initial glb to a draco processed file
 gltfLoader.setDRACOLoader(dracoLoader)
 
 // Bone Animation Sequence file
 const fileLoader = new THREE.FileLoader()
-// fileLoader.setResponseType('arraybuffer')
+fileLoader.setResponseType('blob') // `blob` format needed to parse the file model
 
-// Load a text file and output the result to the console
+// * * * < WORK IN PROGRESS * * *
 fileLoader.load(
-  // resource URL
   FILE_BONE_ANIMATION,
 
-  // onLoad callback
   (file) => {
-    // output the text to the console
-    console.log(file)
+    // Step 1 - convert/manipute? the RTS to some internal format ? Not sure of the approach for now
+    fileReader(file)
+    // Step 2 - From file to THREE.Bone ?
+    // Step 3 - Start loading Megan... include the [bones] from the RTS file
   },
 
   (xhr) => trackProgress(xhr),
   (error) => showError(error)
 )
+// * * * WORK IN PROGRESS /> * * *
 
 gltfLoader.load(
   MEGAN_DRACO_PATH,
   (gltf) => {
-    content = gltf
-
-    console.log({ gltf })
+    model = gltf
 
     // Center Megan into the viewport
-    const box = new THREE.Box3().setFromObject(content.scene)
+    const box = new THREE.Box3().setFromObject(model.scene)
     const center = new THREE.Vector3()
     box.getCenter(center)
-    content.scene.position.sub(center)
+    model.scene.position.sub(center)
 
     // From "model's scene" to "our scene!"
-    scene.add(content.scene)
+    scene.add(model.scene)
 
     // Add Skeleton helper option to GUI
-    const helper = new THREE.SkeletonHelper(content.scene)
+    const helper = new THREE.SkeletonHelper(model.scene)
     helper.visible = false
-    scene.add(helper)
     displayFolder.add(helper, 'visible').name('skeleton')
 
+    scene.add(helper)
+
     // Populate GUI with display properties coming from the glb scene
-    guiPosition(displayFolder, content.scene)
+    guiPosition(displayFolder, model.scene)
 
     /**
      * Animations
      */
-    const { animations } = content || { animations: [] }
-    mixer = new THREE.AnimationMixer(content.scene)
+    const { animations } = model || { animations: [] }
+    mixer = new THREE.AnimationMixer(model.scene)
 
     // Create Array of actions
     const actions = [parameters.action, ...animations.map(({ name }) => name)]

@@ -5,8 +5,8 @@
 
 /**
  * Update Materials
- * @param {*} scene
- * @param {*} callback
+ * @param {THREE.Scene} scene
+ * @param {Function} callback - update materials found in callback
  */
 export const updateAllMaterials = (scene, callback) => {
   scene.traverse((node) => {

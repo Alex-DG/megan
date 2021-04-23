@@ -1,3 +1,6 @@
+/**
+ * Hide loading overlay
+ */
 export const hideLoading = () => {
   const container = document.getElementById('loading-container')
 
@@ -6,6 +9,11 @@ export const hideLoading = () => {
   }
 }
 
+/**
+ * Track loader progression
+ *
+ * @param {ProgressEvent<EventTarget>} xhr
+ */
 export const trackProgress = (xhr) => {
   // if (...) check on total just a quick fix as I'm testing out netlify with threejs model and loading
   // static content (megan = 15mb) for some reason xhr.total is equal to 0 once on netlify.

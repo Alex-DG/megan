@@ -1,5 +1,3 @@
-import { AnimationMixer } from 'three'
-
 /**
  * Actions
  * - active
@@ -12,9 +10,8 @@ let activeAction, previousAction
  * previous actions (if exits) to the current
  * active action.
  *
- * @param {AnimationMixer} name - action
+ * @param {THREE.AnimationMixer} name - action
  * @param {Number} duration - fade in timer
- * @param {Boolean} play
  */
 export const fadeToAction = (action, duration) => {
   previousAction = activeAction
