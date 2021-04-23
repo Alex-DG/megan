@@ -10,7 +10,7 @@ export const fileReader = (file) => {
     const file = event.target.result
 
     // File
-    // console.log(file)
+    console.log(file)
 
     const allLines = file.split(/\r\n|\n/)
 

@@ -108,7 +108,11 @@ fileLoader.load(
   (file) => {
     // Step 1 - convert/manipute? the RTS to some internal format ? Not sure of the approach for now
     fileReader(file)
-    // Step 2 - From file to THREE.Bone ?
+
+    // Step 2 - From file to THREE.Bone THREE.NumberkeyframeTrack ?
+    // just found: https://threejs.org/docs/index.html?q=NumberKeyframeTrack#api/en/animation/tracks/NumberKeyframeTrack
+    // and https://discourse.threejs.org/t/looking-for-a-way-to-animate-model-with-bones-and-joints-rotation-infos/1085/8
+
     // Step 3 - Start loading Megan... include the [bones] from the RTS file
   },
 
