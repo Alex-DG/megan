@@ -4,6 +4,7 @@ import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 
 import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
@@ -18,11 +19,17 @@ import * as dat from 'dat.gui'
  */
 console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
+// GLTF Binary file
+const MEGAN_PATH = '/models/Megan/Megan.glb'
+
+// Bone Animation Sequence file
+// const FILE_BONE_ANIMATION = '/models/Megan/Megan.rts'
+
 /**
  * [ Base ]
  */
 // Debug
-const gui = new dat.GUI({ width: 300 })
+const gui = new dat.GUI({ width: 400 })
 
 let parameters = {
   wireframe: false,
@@ -42,9 +49,6 @@ const scene = new THREE.Scene()
 
 // Model
 let content
-
-// Binary path
-const MEGAN_PATH = '/models/Megan/Megan.glb'
 
 // Animation
 let mixer
@@ -74,7 +78,21 @@ controls.enableDamping = true // enable inertia to give a sense of weight to the
 /**
  * [ Model ]
  */
-const gltfLoader = new GLTFLoader() // initialise loader
+// Draco is a compression method that can be used inside of glTF files
+// https://threejs.org/docs/#examples/en/loaders/DRACOLoader
+const dracoLoader = new DRACOLoader()
+// Specify path to a folder containing WASM/JS decoding libraries.
+dracoLoader.setDecoderPath('/draco/')
+// Optional: Pre-fetch Draco WASM/JS module.
+dracoLoader.preload()
+
+const gltfLoader = new GLTFLoader() // Initialise loader
+// glTF loader is setup with the draco loader which means
+// if you load a draco file the draco loader will kick off, if it's a standard
+// glTF file the glTF loader is smart enough to not load draco in that case when not needed
+gltfLoader.setDRACOLoader(dracoLoader)
+
+let time = 0
 
 gltfLoader.load(
   MEGAN_PATH,
@@ -122,8 +140,14 @@ gltfLoader.load(
     hideLoading()
 
     console.log('...::..::: Hi from Megan 👋 :::..::.:..')
+    console.log(`time = ${time}`)
   },
-  (xhr) => trackProgress(xhr),
+
+  (xhr) => {
+    time += 1
+    trackProgress(xhr)
+  },
+
   (error) => showError(error)
 )
 
