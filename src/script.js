@@ -19,8 +19,14 @@ import * as dat from 'dat.gui'
  */
 console.log('...::..::: Loading Megan 🤖 :::..::.:..')
 
-// GLTF Binary file
-const MEGAN_PATH = '/models/Megan/Megan.glb'
+/**
+ * MODEL PATHS
+ */
+// const MEGAN_PATH = '/models/Megan/Megan.glb'
+
+// Megan model optimised with gltf-pipeline binary file is now ~20% smaller
+// https://github.com/CesiumGS/gltf-pipeline
+const MEGAN_DRACO_PATH = '/models/Megan/Megan-processed.glb'
 
 // Bone Animation Sequence file
 // const FILE_BONE_ANIMATION = '/models/Megan/Megan.rts'
@@ -93,9 +99,10 @@ const gltfLoader = new GLTFLoader() // Initialise loader
 gltfLoader.setDRACOLoader(dracoLoader)
 
 let time = 0
+console.log(MEGAN_DRACO_PATH)
 
 gltfLoader.load(
-  MEGAN_PATH,
+  MEGAN_DRACO_PATH,
   (gltf) => {
     content = gltf
 
