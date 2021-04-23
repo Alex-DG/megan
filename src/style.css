@@ -38,7 +38,9 @@ body {
 
 .loading {
   margin: 0 auto;
-  background-color: azure;
+  background-color: white;
+  color: black;
+
   padding: 15px;
 
   border: 3px solid black;

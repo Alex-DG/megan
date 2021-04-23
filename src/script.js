@@ -107,8 +107,11 @@ fileLoader.load(
 
   async (file) => {
     const data = await readRtsFile(file)
-    const bones = buildBoneAnimationSequence(data)
-    console.log('Bones from RTS 🦴', { bones })
+    const { boneAnimationSequence, frameRate } = buildBoneAnimationSequence(
+      data
+    )
+
+    console.log('Bones from RTS 🦴', { boneAnimationSequence, frameRate })
     console.log('=> Do something with these bones now! 🦴🦴🦴')
 
     // {Step1} - convert RTS to readable data [ DONE ]!!!
