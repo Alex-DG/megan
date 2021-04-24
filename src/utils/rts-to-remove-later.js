@@ -1,3 +1,10 @@
+/**
+ * - - FIRST TRIED AND TESTS - -
+ * I KEPT THE FILE FOR RECORD
+ * BUT NOT USED ANYMORE
+ * TO REMOVE ONCE FINAL SOLUTION FOUND
+ */
+
 import { chunk, uniqueStrings } from './array'
 
 /**
@@ -44,7 +51,6 @@ export const buildBoneAnimationSequence = (data) => {
    *
    */
   let boneAnimationSequence = []
-
   let frameRate, bones
 
   // Reading line by line
@@ -56,8 +62,9 @@ export const buildBoneAnimationSequence = (data) => {
         break
       case 1:
         // Line #2 contains bone animation channels
-        const names = line.split(',')
-        bones = uniqueStrings(names)
+        const boneNameValues = line.split(',')
+        bones = uniqueStrings(boneNameValues)
+
         break
       default:
         // Line #(index+1) animation values (comma separated) for the channels
@@ -65,13 +72,13 @@ export const buildBoneAnimationSequence = (data) => {
         /**
          * {Step 1} - Generate an array with all animations values
          */
-        const animationValues = line.split(',')
+        const values = line.split(',')
 
         /**
          * {Step 2} - Generate arrays of all channels
          * [9 channels] = (tx, ty, tz for translation, rx, ry, rz for rotation, sx, sy, sz for scale)
          */
-        const channels = chunk(animationValues, 9)
+        const channels = chunk(values, 9)
 
         /**
          * {Step 3} - Generate new bone objects <=> { bone name and 3d transform }
