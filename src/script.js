@@ -12,7 +12,7 @@ import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/gui'
 import { fadeToAction } from './utils/animation'
-import { buildBoneAnimationSequence, readRtsFile } from './utils/rtsFile'
+import { buildAnimationClip, readRtsFile } from './utils/rtsAnimation'
 
 /**
  * Project template: gui, scene/ground/camera, orbital controls!
@@ -101,100 +101,95 @@ gltfLoader.setDRACOLoader(dracoLoader)
 const fileLoader = new THREE.FileLoader()
 fileLoader.setResponseType('blob') // `blob` format needed to parse the file model
 
-// * * * < WORK IN PROGRESS * * *
+const loadMeganGlb = (rtsAnimationClip) => {
+  gltfLoader.load(
+    MEGAN_DRACO_PATH,
+    (gltf) => {
+      // Add the RTS AnimationClip to Megan
+      model = { ...gltf, animations: [...gltf.animations, rtsAnimationClip] }
+
+      // Center Megan into the viewport
+      const box = new THREE.Box3().setFromObject(model.scene)
+      const center = new THREE.Vector3()
+      box.getCenter(center)
+      model.scene.position.sub(center)
+
+      // From "model's scene" to "our scene!"
+      scene.add(model.scene)
+
+      // Add Skeleton helper option to GUI
+      const helper = new THREE.SkeletonHelper(model.scene)
+      helper.visible = false
+      displayFolder.add(helper, 'visible').name('skeleton')
+
+      scene.add(helper)
+
+      // Populate GUI with display properties coming from the glb scene
+      guiPosition(displayFolder, model.scene)
+
+      /**
+       * Animations
+       */
+      const { animations } = model || { animations: [] }
+
+      mixer = new THREE.AnimationMixer(model.scene)
+
+      // Example about how to trigger the RTS animation clip
+      //
+      // const action = mixer.clipAction(
+      //   animations.find((a) => a.name === 'rts') // can also do [animationClip].findByName('myName')
+      // )
+      // action.play() // Will play the added RTS animation!
+
+      // Create Array of actions
+      const actions = [parameters.action, ...animations.map(({ name }) => name)]
+
+      // Populate GUI with actions
+      animationsFolder.add(parameters, 'action', actions).onChange((value) => {
+        switch (value) {
+          case 'none':
+            fadeToAction(undefined, 0.5) // stop previous action
+            break
+          default:
+            const action = mixer.clipAction(
+              animations.find((a) => a.name === value)
+            )
+            fadeToAction(action, 0.5) // play selected action
+        }
+      })
+
+      /**
+       * Loading done with success!
+       */
+      hideLoading()
+
+      console.log('...::..::: Hi from Megan-processed! 👋 :::..::.:..')
+    },
+
+    (xhr) => trackProgress(xhr, 'glb'),
+    (error) => showError(error)
+  )
+}
+
+/**
+ * Load .RTS file
+ */
+// * * * < WORK IN PROGRESS - RTS clip * * *
 fileLoader.load(
   FILE_BONE_ANIMATION,
 
   async (file) => {
-    const data = await readRtsFile(file)
-    const { boneAnimationSequence, frameRate } = buildBoneAnimationSequence(
-      data
-    )
+    const rtsData = await readRtsFile(file) // Wait for the file content to be available
+    const { clip } = buildAnimationClip(rtsData)
 
-    console.log('Bones from RTS 🦴', { boneAnimationSequence, frameRate })
-    console.log('=> Do something with these bones now! 🦴🦴🦴')
-
-    // {Step1} - convert RTS to readable data [ DONE ]!!!
-
-    // {Step 2} - [ TODO ] - reading documentation, checking examples in three.js repo
-    // create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
-    // Note: the keyframe track type should correspond to the type of the property being animated
-
-    // TRANSLATION
-    // const positionKF = new THREE.VectorKeyframeTrack( '.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
-    // SCALE
-    // const scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
-    // ROTATION
-    // Rotation should be performed using quaternions, using a THREE.QuaternionKeyframeTrack
-    // Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
-
-    // {Step 3} - [ TODO ]
-    // Start loading Megan... include the [frames] from the RTS file ? (just guessing not sure yet)
+    // Load megan with the created clip from the .rts file!
+    loadMeganGlb(clip)
   },
 
   (xhr) => trackProgress(xhr, 'file'),
   (error) => showError(error)
 )
-// * * * WORK IN PROGRESS /> * * *
-
-gltfLoader.load(
-  MEGAN_DRACO_PATH,
-  (gltf) => {
-    model = gltf
-
-    // Center Megan into the viewport
-    const box = new THREE.Box3().setFromObject(model.scene)
-    const center = new THREE.Vector3()
-    box.getCenter(center)
-    model.scene.position.sub(center)
-
-    // From "model's scene" to "our scene!"
-    scene.add(model.scene)
-
-    // Add Skeleton helper option to GUI
-    const helper = new THREE.SkeletonHelper(model.scene)
-    helper.visible = false
-    displayFolder.add(helper, 'visible').name('skeleton')
-
-    scene.add(helper)
-
-    // Populate GUI with display properties coming from the glb scene
-    guiPosition(displayFolder, model.scene)
-
-    /**
-     * Animations
-     */
-    const { animations } = model || { animations: [] }
-    mixer = new THREE.AnimationMixer(model.scene)
-
-    // Create Array of actions
-    const actions = [parameters.action, ...animations.map(({ name }) => name)]
-
-    // Populate GUI with actions
-    animationsFolder.add(parameters, 'action', actions).onChange((value) => {
-      switch (value) {
-        case 'none':
-          fadeToAction(undefined, 0.5) // stop previous action
-          break
-        default:
-          const action = mixer.clipAction(
-            animations.find((a) => a.name === value)
-          )
-          fadeToAction(action, 0.5) // play selected action
-      }
-    })
-
-    /**
-     * Loading done with success!
-     */
-    hideLoading()
-
-    console.log('...::..::: Hi from Megan-processed! 👋 :::..::.:..')
-  },
-
-  (xhr) => trackProgress(xhr, 'glb'),
-  (error) => showError(error)
-)
+// * * * RTS clip - WORK IN PROGRESS /> * * *
 
 /**
  * [ Ground ]
