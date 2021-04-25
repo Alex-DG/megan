@@ -11,8 +11,8 @@ import { hideLoading, trackProgress } from './utils/loader'
 import { updateAllMaterials } from './utils/update'
 import { showError } from './utils/error'
 import { guiPosition, guiDirectionalLight } from './utils/gui'
-import { fadeToAction } from './utils/animation'
-import { buildAnimationClip, readRtsFile } from './utils/rtsAnimation'
+import { fadeToAction, buildAnimationClip } from './utils/animation'
+import { readRtsFile } from './utils/file'
 
 /**
  * Project template: gui, scene/ground/camera, orbital controls!
@@ -132,14 +132,15 @@ const loadMeganGlb = (rtsAnimationClip) => {
        */
       const { animations } = model || { animations: [] }
 
-      mixer = new THREE.AnimationMixer(model.scene)
+      // Testing & comparing animations values
+      const meganAnimation2 = animations[1].toJSON()
+      const rtsAnimation = animations[3].toJSON()
+      console.log('[ Testing & comparing animations values 🆚 ]', {
+        meganAnimation2,
+        rtsAnimation,
+      })
 
-      // Example about how to trigger the RTS animation clip
-      //
-      // const action = mixer.clipAction(
-      //   animations.find((a) => a.name === 'rts') // can also do [animationClip].findByName('myName')
-      // )
-      // action.play() // Will play the added RTS animation!
+      mixer = new THREE.AnimationMixer(model.scene)
 
       // Create Array of actions
       const actions = [parameters.action, ...animations.map(({ name }) => name)]

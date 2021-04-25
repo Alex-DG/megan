@@ -1,9 +1,12 @@
 # Three.js Megan
 
-[DEMO](https://threejs-megan.netlify.app/)
+- Please keep your web browser console open to see the logs.
 
-- I tried to describe through all my comnments my approach and how I was looking for more details in Three.js doc
-- Please keep your web browser console open to see the logs
+- I tried to describe through all my comnments my approach and shared examples, documentations I was working with.
+
+- At this time, I'm not done with the .rts to animation clip part still WIP. See in `animation.js` the `buildAnimationClip()` function. I think something is wrong with my `new QuaternionKeyframeTrack` and the duration + values given on initialising a new KeyFrameTrack.
+
+[demo](https://threejs-megan.netlify.app/)
 
 ## Setup
 

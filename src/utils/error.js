@@ -9,5 +9,5 @@ export const showError = (error) => {
   // Hide overlay
   hideLoading()
 
-  alert(error.message)
+  alert(`💔 ${error.message}`)
 }
