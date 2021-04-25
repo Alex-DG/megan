@@ -61,7 +61,8 @@ export const buildAnimationClip = (fileContent) => {
   // following this pattern: (tx, ty, tz) = `position`, (rx, ry, rz) = `rotation`, (sx, sy, sz) = `scale`
   const boneChannelNames = chunk(boneAnimationChannels, 3).reduce(
     (results, boneChannels) => {
-      const nameChannel1 = boneChannels[0].split('.')
+      const nameChannel1 = boneChannels[0].split('.') // <boneName>.<animationChannelName>
+
       const channel = nameChannel1[1],
         name = nameChannel1[0]
 
@@ -87,8 +88,8 @@ export const buildAnimationClip = (fileContent) => {
    * Each subsequent line contains the animation values for the channels of line #2 for a single frame of animation
    */
 
-  const boneChannelvalues = lines
-    //  we only need lines > 1 (we don't want the frame rate or the bones/channels' names)
+  const boneChannelValues = lines
+    // we only need lines > 1 (we don't want the frame rate or the bones/channels' names)
     .filter((line, index) => index > 1 && line !== '')
     // each line contain values (comma separated) for the channels of line #2
     .map((line) => line.split(','))
@@ -97,7 +98,7 @@ export const buildAnimationClip = (fileContent) => {
       return valuesStr.map((floatStr) => Number(floatStr))
     })
 
-  console.log('Step 1 ✅ ', { boneChannelNames, boneChannelvalues })
+  console.log('Step 1 ✅ ', { boneChannelNames, boneChannelValues })
 
   /////////////////////////////////////////////////////////////////////////
   // {STEP 2} - Create KeyFrameTracks array
@@ -105,7 +106,7 @@ export const buildAnimationClip = (fileContent) => {
   /////////////////////////////////////////////////////////////////////////
 
   /**
-   * First I used random values for each KeyFrameTrack from a tree.js repo example
+   * First I used random values for each KeyFrameTrack from a three.js repo example
    * see example: https://github.com/mrdoob/three.js/blob/master/examples/misc_animation_keys.html
    * To test if I could load the clip generated within Megan (seems ok 👍), the behaviour was not ok obviously (with random/wrong values), but no crash!
    */
@@ -114,7 +115,7 @@ export const buildAnimationClip = (fileContent) => {
     (keyFrameTracks, boneChannel, index) => {
       const channelName = boneChannel.split('.')[1] // for reference: `boneName.ChannelName`
 
-      const values = boneChannelvalues[index] // we want to channels' values of the same matching boneChannelNames array
+      const values = boneChannelValues[index] // we want to channels' values of the same matching boneChannelNames array
 
       switch (channelName) {
         // -> VectorKeyframeTrack
@@ -124,7 +125,7 @@ export const buildAnimationClip = (fileContent) => {
           const keyFrame = new THREE.VectorKeyframeTrack(
             boneChannel,
             [0, 1, 2],
-            values
+            values // or for position something like `values.slice(0, 3)` and for scale `values.slice(6, 9)`
           )
 
           return [...keyFrameTracks, keyFrame]
@@ -135,7 +136,7 @@ export const buildAnimationClip = (fileContent) => {
           //   const quaternionKeyFrame = new THREE.QuaternionKeyframeTrack(
           //     boneChannel,
           //     [0, 1, 2],
-          //     values
+          //     values or values.slice(3, 6) // not working
           //   )
           const xAxis = new THREE.Vector3(1, 0, 0)
 

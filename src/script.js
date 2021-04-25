@@ -36,6 +36,7 @@ const FILE_BONE_ANIMATION = '/models/Megan/Megan.rts'
  */
 // Debug
 const gui = new dat.GUI({ width: 400 })
+gui.hide()
 
 let parameters = {
   wireframe: false,
@@ -171,6 +172,7 @@ const loadMeganGlb = (rtsAnimationClip) => {
        * Loading done with success!
        */
       hideLoading()
+      gui.show()
 
       console.log('...::..::: Hi from Megan-processed! 👋 :::..::.:..')
     },
