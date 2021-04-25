@@ -6,7 +6,8 @@
 html,
 body {
   overflow: hidden;
-  background-color: rgb(27, 27, 27);
+  background-color: #423e3e;
+  font-family: Arial, Helvetica, Arial, sans-serif;
 }
 
 .webgl {
@@ -14,4 +15,58 @@ body {
   top: 0;
   left: 0;
   outline: none;
+}
+
+.loader {
+  -webkit-perspective: 120px;
+  -moz-perspective: 120px;
+  -ms-perspective: 120px;
+  perspective: 120px;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.loader-text {
+  font-size: 1.5rem;
+  color: white;
+  margin: 1em;
+}
+
+.loader:before {
+  border: 6px solid white;
+  content: '';
+  position: absolute;
+  left: 25px;
+  top: 25px;
+  width: 50px;
+  height: 50px;
+  background-color: #423e3e;
+  animation: flip 1.5s infinite;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotate(0);
+  }
+
+  50% {
+    transform: rotateY(180deg);
+  }
+
+  100% {
+    transform: rotateY(180deg) rotateX(180deg);
+  }
+}
+
+#loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+
+  width: 100%;
+  height: 100vh;
 }
