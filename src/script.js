@@ -99,7 +99,7 @@ gltfLoader.setDRACOLoader(dracoLoader)
 
 // Bone Animation Sequence file
 const fileLoader = new THREE.FileLoader()
-fileLoader.setResponseType('blob') // `blob` format needed to parse the file model
+fileLoader.setResponseType('blob') // `blob` format needed to parse the rts file
 
 const loadMeganGlb = (rtsAnimationClip) => {
   gltfLoader.load(
@@ -113,6 +113,14 @@ const loadMeganGlb = (rtsAnimationClip) => {
       const center = new THREE.Vector3()
       box.getCenter(center)
       model.scene.position.sub(center)
+
+      // Add shadow
+      model.scene.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true
+          node.receiveShadow = true
+        }
+      })
 
       // From "model's scene" to "our scene!"
       scene.add(model.scene)
